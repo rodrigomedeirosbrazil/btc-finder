@@ -1,4 +1,5 @@
 import CoinKey from 'coinkey';
+import { intervalToDuration } from 'date-fns'
 
 const PRIVATE_KEY_LENGTH = 64;
 
