@@ -15,8 +15,15 @@ const generateWifFromPrivateKey = (privateKey) => {
 
 const showProgress = (startTime, number, startNumber, targetNumber) => {
     if ((Date.now() - startTime) % 10000 === 0) {
-        console.log('Progress: ', number.toString(16).padStart(14, '0'));
+        console.log('Elapsed time: ', (Date.now() - startTime) / 1000, ' seconds');
+        console.log('Progress: ', (BigInt(`0x${startNumber}`) - number) / BigInt(`0x${startNumber}`) * 100, '%');
+        console.log('Last number tried: ', number.toString(16).padStart(14, '0'));
     }
+}
+
+const calculateProgress = (startNumber, targetNumber, number) => {
+    const range = BigInt(`0x${startNumber}`) - BigInt(`0x${targetNumber}`);
+    return Number(BigInt(`0x${startNumber}`) - number) / Number(range) * 100;
 }
 
 const generatePrivateKeyUsingPrefix = (prefix, number) => {
@@ -29,9 +36,9 @@ const generateHighestStartNumber = (prefixPrivateKey) => {
     return 'F'.repeat(PRIVATE_KEY_LENGTH - prefixPrivateKey.length);
 }
 
-const targetPublicKey = '18bHfcm8kGoAhBaQXzzVcG5534mdpWK981';
-const prefixPrivateKey = 'C0DE000000000000000000000000000000000000000000003';
-const startNumber = 'fffffffdd134ec8'; //generateHighestStartNumber(prefixPrivateKey);
+const targetPublicKey = '1CQFwcjw1dwhtkVWBttNLDtqL7ivBonGPV'; // '18bHfcm8kGoAhBaQXzzVcG5534mdpWK981';
+const prefixPrivateKey = '0000000000000000000000000000000000000000000000000000000000000'; //'C0DE000000000000000000000000000000000000000000003';
+const startNumber = generateHighestStartNumber(prefixPrivateKey); // 'fffffffdc2b6b67'; //generateHighestStartNumber(prefixPrivateKey);
 
 console.log(`Target public key: ${targetPublicKey}`);
 console.log(`Prefix private key: ${prefixPrivateKey} (${prefixPrivateKey.length})`);
@@ -42,10 +49,10 @@ const startTime = Date.now();
 
 for (let number = BigInt(`0x${startNumber}`); number > 0; number = number - BigInt(1)) {
     const privateKey = generatePrivateKeyUsingPrefix(prefixPrivateKey, number);
-    showProgress(startTime, number, startNumber, 0);
     const publicKey = generatePublicKeyFromPrivateKey(privateKey);
+    console.log(calculateProgress(startNumber, BigInt(0), number).toFixed(0), '%');
     if (publicKey === targetPublicKey) {
-        console.log('Private key found!');
+        console.log(`Private key found!: ${privateKey}`);
         console.log(`WIF: ${generateWifFromPrivateKey(privateKey)}`);
         break;
     }
