@@ -49,10 +49,13 @@ let postfix;
 let privateKey;
 let publicKey;
 let lastDisplayedTime = startTime;
+let privateKeyCount = 0; // Keep track of generated keys
 
 while (true) {
     postfix = generateRandomHex(postfixLength);
     privateKey = prefixPrivateKey + postfix;
+    privateKeyCount++; // Increment counter for each generated key
+
     try {
         publicKey = generatePublicKeyFromPrivateKey(privateKey);
     } catch (error) {
@@ -62,10 +65,14 @@ while (true) {
     // Check for one second interval
     const currentTime = Date.now();
     if (currentTime - lastDisplayedTime >= 1000) {
+        const keysPerSecond = privateKeyCount; // Capture count before reset
+        privateKeyCount = 0; // Reset counter for next second
+
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
         process.stdout.write(
         `Elapsed time: ${getTimeElapsed(startTime)} ` +
+            `Keys/second: ${keysPerSecond} ` +
             `Last privateKey: ${privateKey} `
         );
         lastDisplayedTime = currentTime;
