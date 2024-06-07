@@ -48,6 +48,7 @@ const postfixLength = PRIVATE_KEY_LENGTH - prefixPrivateKey.length;
 let postfix;
 let privateKey;
 let publicKey;
+let lastDisplayedTime = startTime;
 
 while (true) {
     postfix = generateRandomHex(postfixLength);
@@ -58,12 +59,17 @@ while (true) {
         continue;
     }
 
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
-    process.stdout.write(
+    // Check for one second interval
+    const currentTime = Date.now();
+    if (currentTime - lastDisplayedTime >= 1000) {
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+        process.stdout.write(
         `Elapsed time: ${getTimeElapsed(startTime)} ` +
-        `Last privateKey: ${privateKey} `
-    );
+            `Last privateKey: ${privateKey} `
+        );
+        lastDisplayedTime = currentTime;
+    }
 
     if (publicKey === targetPublicKey) {
         console.log('');
